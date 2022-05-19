@@ -1,18 +1,16 @@
-import menu
-import regex_dfa
+import consultant
+import constructor
 
 
 def main():
-    option = menu.init()
+    option = consultant.show_menu()
 
     if option == 0:
         regex = input('Input REGEX: ')
-        regex_dfa.to_dfa(regex)
-    elif option == 1:
-        regex = input('Input REGEX: ')
+        constructor.to_dfa(regex)
     else:
         print('Test 1: (a|b)*abb')
-        regex_dfa.to_dfa('(a|b)*abb')
+        constructor.to_dfa('(a|b)*abb')
 
 
 if __name__ == "__main__":
