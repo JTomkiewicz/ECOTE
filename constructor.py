@@ -1,6 +1,46 @@
 import re
 
-from sympy import false
+
+class Node:
+    def __init__(self, id, char, children) -> None:
+        self.id = id
+        self.char = char
+        self.children = children
+        pass
+
+
+class SyntaxTree:
+    def __init__(self) -> None:
+        self.nodes = []
+        pass
+
+    def parse(self, regex):
+        nr_of_brackets = regex.count('(')
+
+        for i in reversed(range(nr_of_brackets)):
+            index_begin = findNthOccur(regex, '(', i)
+            index_end = findNthOccur(regex, ')', 0)
+
+            print(regex[index_begin + 1:index_end])
+
+            regex = regex[0:index_begin] + regex[index_end+1:]
+
+        print(regex)
+        # node = Node(1, 'a', [1])
+        # self.nodes.append(node)
+
+
+def findNthOccur(string, ch, N):
+    occur = 0
+    N = N + 1
+
+    for i in range(len(string)):
+        if (string[i] == ch):
+            occur += 1
+        if (occur == N):
+            return i
+
+    return -1
 
 
 def is_regex_correct(regex: str) -> bool:
@@ -31,3 +71,12 @@ def to_dfa(regex: str):
     if not is_regex_correct(regex):
         print('Given REGEX is incorrect')
         quit()
+
+    # construct augmented regex
+    regex += '#'
+
+    # construct syntax tree
+    st = SyntaxTree()
+    st.parse(regex)
+
+    # evaluate functions
