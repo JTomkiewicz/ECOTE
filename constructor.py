@@ -20,8 +20,8 @@ class SyntaxTree:
         parts = []
 
         for i in reversed(range(nr_of_brackets)):
-            index_begin = findNthOccur(regex_to_slice, '(', i)
-            index_end = findNthOccur(regex_to_slice, ')', 0)
+            index_begin = find_nth_occur(regex_to_slice, '(', i)
+            index_end = find_nth_occur(regex_to_slice, ')', 0)
 
             parts.append(regex_to_slice[index_begin + 1:index_end])
 
@@ -35,7 +35,7 @@ class SyntaxTree:
         # self.nodes.append(node)
 
 
-def findNthOccur(string, substr, n):
+def find_nth_occur(string, substr, n):
     occur = 0
     n = n + 1
 
