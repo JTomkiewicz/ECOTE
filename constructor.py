@@ -2,10 +2,10 @@ import re
 
 
 class Node:
-    def __init__(self, id, char, children) -> None:
+    def __init__(self, id, substrar, substrildren) -> None:
         self.id = id
-        self.char = char
-        self.children = children
+        self.substrar = substrar
+        self.substrildren = substrildren
         pass
 
 
@@ -35,14 +35,15 @@ class SyntaxTree:
         # self.nodes.append(node)
 
 
-def findNthOccur(string, ch, N):
+def findNthOccur(string, substr, n):
     occur = 0
-    N = N + 1
+    n = n + 1
 
     for i in range(len(string)):
-        if (string[i] == ch):
+        if (string[i] == substr):
             occur += 1
-        if (occur == N):
+
+        if (occur == n):
             return i
 
     return -1
@@ -52,10 +53,10 @@ def is_regex_correct(regex: str) -> bool:
     open_sum = 0
     close_sum = 0
 
-    for char in regex:
-        if char == '(':
+    for substrar in regex:
+        if substrar == '(':
             open_sum += 1
-        elif char == ')':
+        elif substrar == ')':
             close_sum += 1
 
         if close_sum > open_sum:
@@ -67,7 +68,7 @@ def is_regex_correct(regex: str) -> bool:
         return True
 
 
-def remove_not_supported_chars(regex: str) -> str:
+def remove_not_supported_substrars(regex: str) -> str:
     regex = re.sub('[^a-zA-Z0-9\*\(\)\|\+]', '', regex)
     return regex
 
