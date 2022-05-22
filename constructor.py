@@ -16,16 +16,21 @@ class SyntaxTree:
 
     def parse(self, regex):
         nr_of_brackets = regex.count('(')
+        regex_to_slice = regex
+        parts = []
 
         for i in reversed(range(nr_of_brackets)):
-            index_begin = findNthOccur(regex, '(', i)
-            index_end = findNthOccur(regex, ')', 0)
+            index_begin = findNthOccur(regex_to_slice, '(', i)
+            index_end = findNthOccur(regex_to_slice, ')', 0)
 
-            print(regex[index_begin + 1:index_end])
+            parts.append(regex_to_slice[index_begin + 1:index_end])
 
-            regex = regex[0:index_begin] + regex[index_end+1:]
+            regex_to_slice = regex_to_slice[0:index_begin] + \
+                regex_to_slice[index_end+1:]
 
-        print(regex)
+        parts.append(regex_to_slice)
+
+        print(parts)
         # node = Node(1, 'a', [1])
         # self.nodes.append(node)
 
