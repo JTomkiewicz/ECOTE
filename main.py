@@ -7,6 +7,7 @@ def main():
 
     if option == 0:
         regex = input('Input REGEX: ')
+        regex = constructor.remove_not_supported_chars(regex)
         constructor.to_dfa(regex)
     else:
         print('Test 1: (a|b)*abb')
