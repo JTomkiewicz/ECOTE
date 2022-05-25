@@ -1,7 +1,7 @@
 import re
 
 
-def read_option():
+def read_option() -> int:
     while True:
         try:
             number = input('Input: ')
@@ -12,24 +12,18 @@ def read_option():
     return int(number)
 
 
-def show_menu():
+def show_menu(txt: str) -> None:
     print('What would you like to do?')
-    print('0 - convert REGEX to DFA\n1 - see some tests\n2 - exit')
+    print(f'0 - {txt}\n1 - exit')
 
     while True:
         option = read_option()
-        if option in range(3):
+        if option in range(2):
             break
-        print('Insert 0, 1 or 2!')
+        print('Insert 0 or 1!')
 
-    if option == 2:
+    if option == 1:
         quit()
-
-    return option
-
-
-def remove_not_supported_chars(regex: str) -> str:
-    return re.sub('[^a-zA-Z0-9\*\(\)\|\+]', '', regex)
 
 
 def is_regex_correct(regex: str) -> None:
@@ -55,6 +49,11 @@ def is_regex_correct(regex: str) -> None:
 
 def read_regex() -> str:
     regex = input('Input REGEX: ')
-    regex = remove_not_supported_chars(regex)
+    regex = re.sub('[^a-zA-Z0-9\*\(\)\|\+]', '', regex)
     is_regex_correct(regex)
     return regex
+
+
+def read_input_string() -> str:
+    input_string = input('Input REGEX: ')
+    return input_string
