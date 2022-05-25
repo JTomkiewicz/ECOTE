@@ -25,13 +25,6 @@ def show_menu():
     return option
 
 
-def show_syntax_tree():
-    print('hello world')
-
-
-def show_functions():
-    print('hello world')
-
-
-def show_dfa():
-    print('hello world')
+def read_regex():
+    regex = input('Input REGEX: ')
+    return regex

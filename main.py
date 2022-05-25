@@ -13,12 +13,11 @@ def main():
         run_tests()
         return
 
-    regex = input('Input REGEX: ')
+    regex = consultant.read_regex()
 
     regex = constructor.remove_not_supported_chars(regex)
 
     if not constructor.is_regex_correct(regex):
-        print('Given REGEX is incorrect')
         return
 
     # construct augmented regex

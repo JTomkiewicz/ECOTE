@@ -51,6 +51,7 @@ def find_nth_occur(string, substr, n):
 
 def is_regex_correct(regex: str) -> bool:
     if len(regex.strip()) == 0:
+        print('Given REGEX is empty!')
         return False
 
     open_sum, close_sum = 0, 0
@@ -62,9 +63,11 @@ def is_regex_correct(regex: str) -> bool:
             close_sum += 1
 
         if close_sum > open_sum:
+            print('Given REGEX contain closing parentheses before opening parentheses!')
             return False
 
     if open_sum != close_sum:
+        print('Given REGEX contain different number of closing and opening parentheses')
         return False
 
     return True
