@@ -4,6 +4,16 @@ import constructor
 
 def run_tests():
     print('Test 1: (a|b)*abb')
+    procedure('(a|b)*abb', True)
+
+
+def procedure(regex: str, is_test: bool = False) -> None:
+    # construct augmented regex
+    regex += '#'
+
+    # construct syntax tree
+    st = constructor.SyntaxTree()
+    st.parse(regex)
 
 
 def main():
@@ -14,18 +24,7 @@ def main():
         return
 
     regex = consultant.read_regex()
-
-    regex = constructor.remove_not_supported_chars(regex)
-
-    if not constructor.is_regex_correct(regex):
-        return
-
-    # construct augmented regex
-    regex += '#'
-
-    # construct syntax tree
-    st = constructor.SyntaxTree()
-    st.parse(regex)
+    procedure(regex)
 
 
 if __name__ == "__main__":

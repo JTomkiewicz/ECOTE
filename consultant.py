@@ -1,3 +1,6 @@
+import re
+
+
 def read_option():
     while True:
         try:
@@ -25,6 +28,33 @@ def show_menu():
     return option
 
 
-def read_regex():
+def remove_not_supported_chars(regex: str) -> str:
+    return re.sub('[^a-zA-Z0-9\*\(\)\|\+]', '', regex)
+
+
+def is_regex_correct(regex: str) -> None:
+    if len(regex.strip()) == 0:
+        raise Exception('Given REGEX is empty!')
+
+    open_sum, close_sum = 0, 0
+
+    for char in regex:
+        if char == '(':
+            open_sum += 1
+        elif char == ')':
+            close_sum += 1
+
+        if close_sum > open_sum:
+            raise Exception(
+                'Given REGEX contain closing parentheses before opening parentheses!')
+
+    if open_sum != close_sum:
+        raise Exception(
+            'Given REGEX contain different number of closing and opening parentheses')
+
+
+def read_regex() -> str:
     regex = input('Input REGEX: ')
+    regex = remove_not_supported_chars(regex)
+    is_regex_correct(regex)
     return regex
