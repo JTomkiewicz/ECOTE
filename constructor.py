@@ -1,12 +1,12 @@
 class Node:
-    def __init__(self, id, substrar, substrildren) -> None:
+    def __init__(self, id, substrar, substrildren):
         self.id = id
         self.substrar = substrar
         self.substrildren = substrildren
 
 
 class SyntaxTree:
-    def __init__(self) -> None:
+    def __init__(self):
         self.nodes = []
 
     def parse(self, regex):
