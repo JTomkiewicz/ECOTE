@@ -55,5 +55,5 @@ def read_regex() -> str:
 
 
 def read_input_string() -> str:
-    input_string = input('Input REGEX: ')
+    input_string = input('Input string: ')
     return input_string

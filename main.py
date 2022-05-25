@@ -11,8 +11,8 @@ def main():
     regex += '#'
 
     # construct syntax tree
-    st = constructor.SyntaxTree()
-    st.parse(regex)
+    # st = constructor.SyntaxTree()
+    # st.parse(regex)
 
     # ...
 
