@@ -1,17 +1,6 @@
 import re
 
 
-def read_option() -> int:
-    while True:
-        try:
-            number = input('Input: ')
-            number = int(number)
-            break
-        except ValueError:
-            print('Input must be a integer!')
-    return int(number)
-
-
 def show_menu(txt: str):
     print('What would you like to do?')
     print(f'0 - {txt}\n1 - exit')
@@ -24,6 +13,24 @@ def show_menu(txt: str):
 
     if option == 1:
         quit()
+
+
+def read_option() -> int:
+    while True:
+        try:
+            number = input('Input: ')
+            number = int(number)
+            break
+        except ValueError:
+            print('Input must be a integer!')
+    return int(number)
+
+
+def read_regex() -> str:
+    regex = input('Input regex: ')
+    regex = re.sub('[^a-zA-Z0-9\*\(\)\|\+]', '', regex)
+    is_regex_correct(regex)
+    return regex
 
 
 def is_regex_correct(regex: str):
@@ -45,13 +52,6 @@ def is_regex_correct(regex: str):
     if open_sum != close_sum:
         raise Exception(
             'Given regex contain different number of closing and opening parentheses!')
-
-
-def read_regex() -> str:
-    regex = input('Input regex: ')
-    regex = re.sub('[^a-zA-Z0-9\*\(\)\|\+]', '', regex)
-    is_regex_correct(regex)
-    return regex
 
 
 def read_input_string() -> str:
