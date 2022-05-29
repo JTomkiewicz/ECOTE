@@ -5,7 +5,7 @@ class State:
 
     def __init__(self, alphabet, id_list, id, terminal_id):
         self.id = id
-        self.is_set = set(id_list)
+        self.id_set = set(id_list)
         self.transitions = dict()
         self.final = terminal_id in self.id_set
         for char in alphabet:
