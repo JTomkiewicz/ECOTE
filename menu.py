@@ -30,7 +30,13 @@ def read_regex() -> str:
     regex = input('Input regex: ')
     regex = re.sub('[^a-zA-Z0-9\*\(\)\|\+\.]', '', regex)
     is_regex_correct(regex)
-    return regex
+
+    alphabet = []
+    for char in regex:
+        if char not in alphabet and char not in ['*', '|', '+', '(', ')', '.']:
+            alphabet.append(char)
+
+    return alphabet, regex
 
 
 def is_regex_correct(regex: str):

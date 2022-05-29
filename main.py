@@ -6,7 +6,7 @@ import menu
 def main():
     # show menu & read regex
     menu.show_menu('Convert regex to DFA')
-    regex = menu.read_regex()
+    alphabet, regex = menu.read_regex()
 
     # construct syntax tree
     tree = SyntaxTree(regex)
@@ -14,7 +14,7 @@ def main():
     tree.print_tree()
 
     # construct DFA
-    dfa = DFA(tree)
+    dfa = DFA(tree, alphabet)
 
     # read & check input string (optional)
     while True:
