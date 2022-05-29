@@ -41,7 +41,7 @@ class Node:
 
         if self.rchild:
             ret += self.rchild.print_tree(level + 1, linelist +
-                                          [level] * (not star), rchild=True)
+                                          [level], rchild=True)
 
         return ret
 
