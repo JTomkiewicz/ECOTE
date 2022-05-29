@@ -24,6 +24,7 @@ class SyntaxTree:
         self.id_counter = 1
 
         self.build_tree()
+        self.followpos = [set() for _ in range(self.id_counter)]
         self.calculate_functions(self.root)
 
     def create_tokens(self, regex):
@@ -146,6 +147,12 @@ class SyntaxTree:
             node.lastpos = node.lchild.lastpos
             # compute followpos for star
             self.calculate_followpos(node)
+        elif node.type == 'plus':
+            node.nullable = True  # or is it not?
+            node.firstpos = node.lchild.firstpos
+            node.lastpos = node.lchild.lastpos
+            # compute followpos for plus
+            self.calculate_followpos(node)
         elif node.type == 'concat':
             node.nullable = node.lchild.nullable and node.rchild.nullable
             if node.lchild.nullable:
@@ -159,3 +166,14 @@ class SyntaxTree:
             # conpute followpos for concat
             self.calculate_followpos(node)
         return
+
+    def calculate_followpos(self, node):
+        '''
+        Calculate followpos for star and concat.
+        '''
+        if node.type == 'concat':
+            for pos in node.lchild.lastpos:
+                self.followpos[pos] = self.followpos[pos] | node.rchild.firstpos
+        elif node.type == 'star' or node.type == 'plus':
+            for pos in node.lchild.lastpos:
+                self.followpos[pos] = self.followpos[pos] | node.lchild.firstpos
