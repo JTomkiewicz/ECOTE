@@ -16,6 +16,8 @@ def main():
     # construct DFA
     dfa = DFA(tree, alphabet)
 
+    dfa.print_dfa()
+
     # read & check input string (optional)
     while True:
         menu.show_menu(

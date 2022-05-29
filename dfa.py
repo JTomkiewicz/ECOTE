@@ -71,3 +71,44 @@ class DFA:
                     states.append(state.transitions[char])
 
         return states
+
+    def print_dfa(self):
+        '''
+        Print DFA.
+        '''
+        self.format_states()
+
+        temp_string = ''
+        for state in self.states:
+            if state.id == 1:
+                temp_string += '->\t'
+            else:
+                temp_string += '\t'
+            temp_string += str(state.id) + '\t'
+            for char in self.alphabet:
+                temp_string += char + ' : ' + \
+                    str(state.transitions[char]) + '\t'
+            if state.final:
+                temp_string += '\tFINAL\n'
+        print(temp_string)
+
+    def format_states(self):
+        '''
+        Format states.
+        '''
+        none_states = False
+        for state in self.states:
+            for char in self.alphabet:
+                if state.transitions[char] is None:
+                    none_states = True
+                    state.transitions[char] = self.id_counter
+                temp_transitions = state.transitions[char]
+                for second_state in self.states:
+                    if second_state.id_set == temp_transitions:
+                        state.transitions[char] = second_state.id
+
+        if none_states:
+            self.states.append(
+                State(self.alphabet, [], self.id_counter, self.terminal))
+            for char in self.alphabet:
+                self.states[-1].transitions[char] = self.states[-1].id
