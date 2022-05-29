@@ -24,6 +24,7 @@ class SyntaxTree:
         self.id_counter = 1
 
         self.build_tree()
+        self.calculate_functions(self.root)
 
     def create_tokens(self, regex):
         temp_str = ''
@@ -101,3 +102,6 @@ class SyntaxTree:
         i = self.id_counter
         self.id_counter += 1
         return i
+
+    def calculate_functions(self, node):
+        pass
