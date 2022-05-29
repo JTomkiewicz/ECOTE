@@ -7,38 +7,48 @@ class Node:
 
 class SyntaxTree:
     def __init__(self):
-        self.nodes = []
+        self.tokens = []
+        self.stack = []
 
-    def parse(self, regex):
-        nr_of_brackets = regex.count('(')
-        regex_to_slice = regex
-        parts = []
+    def build(self, regex):
+        self.create_tokens(regex)
+        self.create_stack()
 
-        for i in reversed(range(nr_of_brackets)):
-            index_begin = find_nth_occur(regex_to_slice, '(', i)
-            index_end = find_nth_occur(regex_to_slice, ')', 0)
+    def create_tokens(self, regex):
+        temp_str = ''
+        for char in regex:
+            if char in ['(', ')', '|', '*', '+', '.']:
+                if temp_str != '':
+                    self.tokens.append(temp_str)
+                    temp_str = ''
+                self.tokens.append(char)
+            else:
+                temp_str += char
+        if temp_str != '':
+            self.tokens.append(temp_str)
 
-            parts.append(regex_to_slice[index_begin + 1:index_end])
-
-            regex_to_slice = regex_to_slice[0:index_begin] + \
-                regex_to_slice[index_end+1:]
-
-        parts.append(regex_to_slice)
-
-        print(parts)
-        # node = Node(1, 'a', [1])
-        # self.nodes.append(node)
-
-
-def find_nth_occur(string: str, substr: str, n: int) -> int:
-    occur = 0
-    n = n + 1
-
-    for i in range(len(string)):
-        if string[i] == substr:
-            occur += 1
-
-        if occur == n:
-            return i
-
-    return -1
+    def create_stack(self):
+        temp_stack = []
+        for token in self.tokens:
+            if token == '(':
+                temp_stack.append(token)
+            elif token == ')':
+                while len(temp_stack) > 0 and temp_stack[-1] != '(':
+                    self.stack.append(temp_stack.pop())
+                temp_stack.pop()
+            elif token == '*':
+                temp_stack.append(token)
+            elif token == '|':
+                while len(temp_stack) > 0 and temp_stack[-1] in ['*', '.']:
+                    self.stack.append(temp_stack.pop())
+                temp_stack.append(token)
+            elif token == '+':
+                temp_stack.append(token)
+            elif token == '.':
+                while len(temp_stack) > 0 and temp_stack[-1] in ['*', '+']:
+                    self.stack.append(temp_stack.pop())
+                temp_stack.append(token)
+            else:
+                self.stack.append(token)
+        while len(temp_stack) > 0:
+            self.stack.append(temp_stack.pop())

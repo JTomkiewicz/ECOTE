@@ -28,7 +28,7 @@ def read_option() -> int:
 
 def read_regex() -> str:
     regex = input('Input regex: ')
-    regex = re.sub('[^a-zA-Z0-9\*\(\)\|\+]', '', regex)
+    regex = re.sub('[^a-zA-Z0-9\*\(\)\|\+\.]', '', regex)
     is_regex_correct(regex)
     return regex
 

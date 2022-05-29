@@ -1,5 +1,5 @@
+from constructor import SyntaxTree
 import consultant
-import constructor
 
 
 def main():
@@ -7,10 +7,9 @@ def main():
     consultant.show_menu('Convert regex to DFA')
     regex = consultant.read_regex()
 
-    # construct augmented regex
-    regex += '#'
-
     # construct syntax tree
+    tree = SyntaxTree()
+    tree.build(regex)
 
     # evaluate functions
 
