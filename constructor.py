@@ -1,8 +1,13 @@
 class Node:
-    def __init__(self, id, substrar, substrildren):
+    def __init__(self, type, label, id=None, lchild=None, rchild=None):
+        self.type = type
+        self.label = label
         self.id = id
-        self.substrar = substrar
-        self.substrildren = substrildren
+        self.lchild = lchild
+        self.rchild = rchild
+        self.nullable = False
+        self.firstpos = set()
+        self.lastpos = set()
 
 
 class SyntaxTree:
