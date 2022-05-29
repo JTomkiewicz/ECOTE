@@ -9,12 +9,12 @@ def main():
     regex = menu.read_regex()
 
     # construct syntax tree
-    tree = SyntaxTree()
-    tree.build(regex)
+    tree = SyntaxTree(regex)
 
-    # construct dStates
+    tree.print_tree()
 
-    # draw DFA
+    # construct DFA
+    dfa = DFA(tree)
 
     # read & check input string (optional)
     while True:
