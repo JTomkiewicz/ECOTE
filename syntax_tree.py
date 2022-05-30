@@ -54,22 +54,25 @@ class SyntaxTree:
         self.create_tokens(regex)
         self.create_stack()
 
+        # root node is always concatenation of # (right-hand marker) and rest of the tree
         self.root = Node('concat', '.')
         self.leaves = dict()
         self.id_counter = 1
 
         self.build_tree()
+
+        # evaluate four functions: firstpos, lastpos, nullable, followpos
         self.followpos = [set() for _ in range(self.id_counter)]
         self.calculate_functions(self.root)
 
     def create_tokens(self, regex):
         '''
-        Create tokens from regex.
+        Create tokens (list that has elements and alphabets of regex) from regex.
         '''
         temp_str = ''
 
         for char in regex:
-            if char in ['(', ')', '|', '*', '+', '.']:
+            if char in ['(', ')', '|', '*', '.']:
                 if temp_str != '':
                     self.tokens.append(temp_str)
                     temp_str = ''
@@ -82,27 +85,23 @@ class SyntaxTree:
 
     def create_stack(self):
         '''
-        Create stack from tokens.
+        Create stack from tokens that is later used to create tree.
         '''
         temp_stack = []
 
         for token in self.tokens:
-            if token == '(':
+            if token in ['(', '*']:
                 temp_stack.append(token)
             elif token == ')':
                 while len(temp_stack) > 0 and temp_stack[-1] != '(':
                     self.stack.append(temp_stack.pop())
                 temp_stack.pop()
-            elif token == '*':
-                temp_stack.append(token)
             elif token == '|':
                 while len(temp_stack) > 0 and temp_stack[-1] in ['*', '.']:
                     self.stack.append(temp_stack.pop())
                 temp_stack.append(token)
-            elif token == '+':
-                temp_stack.append(token)
             elif token == '.':
-                while len(temp_stack) > 0 and temp_stack[-1] in ['*', '+']:
+                while len(temp_stack) > 0 and temp_stack[-1] == '*':
                     self.stack.append(temp_stack.pop())
                 temp_stack.append(token)
             else:
@@ -113,7 +112,7 @@ class SyntaxTree:
 
     def build_tree(self):
         '''
-        Build syntax tree.
+        Build syntax tree at this moment without firstpos and lastpos functions.
         '''
         temp_stack = []
 
@@ -126,19 +125,16 @@ class SyntaxTree:
             elif token == '*':
                 lc = temp_stack.pop()
                 temp_stack.append(Node('star', '*', lchild=lc))
-            elif token == '+':
-                lc = temp_stack.pop()
-                temp_stack.append(Node('plus', '+', lchild=lc))
             elif token == '|':
                 lc = temp_stack.pop()
                 rc = temp_stack.pop()
                 temp_stack.append(Node('or', '|', lchild=lc, rchild=rc))
-
             else:
                 temp_node = Node('identifier', token, id=self.next_id())
                 self.leaves[temp_node.id] = temp_node.label
                 temp_stack.append(temp_node)
 
+        # at the end add right-hand marker #
         temp_node = Node('identifier', '#', id=self.next_id())
         self.leaves[temp_node.id] = temp_node.label
         self.root.lchild = temp_stack.pop()
@@ -154,7 +150,7 @@ class SyntaxTree:
 
     def calculate_functions(self, node):
         '''
-        Calculate nullable, firstpos and lastpos for each node.
+        Using recursion calculate nullable, firstpos and lastpos for each node.
         '''
         # stop recursion when node in Nullable
         if not node:
@@ -182,25 +178,18 @@ class SyntaxTree:
             node.lastpos = node.lchild.lastpos
             # compute followpos for star
             self.calculate_followpos(node)
-        elif node.type == 'plus':
-            node.nullable = True  # or is it not?
-            node.firstpos = node.lchild.firstpos
-            node.lastpos = node.lchild.lastpos
-            # compute followpos for plus
-            self.calculate_followpos(node)
         elif node.type == 'concat':
             node.nullable = node.lchild.nullable and node.rchild.nullable
-            if node.lchild.nullable:
+            if node.lchild.nullable:  # firstpos
                 node.firstpos = node.lchild.firstpos | node.rchild.firstpos
             else:
                 node.firstpos = node.lchild.firstpos
-            if node.rchild.nullable:
+            if node.rchild.nullable:  # lastpos
                 node.lastpos = node.lchild.lastpos | node.rchild.lastpos
             else:
                 node.lastpos = node.rchild.lastpos
             # conpute followpos for concat
             self.calculate_followpos(node)
-        return
 
     def calculate_followpos(self, node):
         '''
@@ -209,7 +198,7 @@ class SyntaxTree:
         if node.type == 'concat':
             for pos in node.lchild.lastpos:
                 self.followpos[pos] = self.followpos[pos] | node.rchild.firstpos
-        elif node.type == 'star' or node.type == 'plus':
+        elif node.type == 'star':
             for pos in node.lchild.lastpos:
                 self.followpos[pos] = self.followpos[pos] | node.lchild.firstpos
 

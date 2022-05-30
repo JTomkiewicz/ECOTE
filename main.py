@@ -4,18 +4,16 @@ import menu
 
 
 def main():
-    # show menu & read regex
+    # show menu & read regex with its alphabet
     menu.show_menu('Convert regex to DFA')
     alphabet, regex = menu.read_regex()
 
-    # construct syntax tree
+    # construct & print syntax tree
     tree = SyntaxTree(regex)
-
     tree.print_tree()
 
-    # construct DFA
+    # construct & print DFA
     dfa = DFA(tree, alphabet)
-
     dfa.print_dfa()
 
     # read & check input string (optional)
