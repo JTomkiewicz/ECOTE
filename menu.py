@@ -28,15 +28,15 @@ def read_option():
 
 def read_regex():
     regex = input('Input regex: ')
-    regex = re.sub('[^a-zA-Z0-9\*\(\)\|\.]', '', regex)
+    regex = re.sub('[^a-zA-Z0-9\*\(\)\|]', '', regex)
     is_regex_correct(regex)
-
-    regex = add_cat_symbol(regex)
 
     alphabet = []
     for char in regex:
         if char not in alphabet and char not in ['*', '|', '(', ')', '.']:
             alphabet.append(char)
+
+    regex = add_cat_symbol(regex, alphabet)
 
     return alphabet, regex
 
@@ -62,8 +62,18 @@ def is_regex_correct(regex):
             'Given regex contain different number of closing and opening parentheses!')
 
 
-def add_cat_symbol(regex):
-    pass
+def add_cat_symbol(regex, alphabet):
+    i = 0
+    while True:
+        if i == len(regex) - 1:
+            break
+        if regex[i] in alphabet and regex[i+1] in alphabet:
+            regex = regex[:i+1] + '.' + regex[i+1:]
+            i = 0
+        else:
+            i += 1
+
+    return regex
 
 
 def read_input_string():
