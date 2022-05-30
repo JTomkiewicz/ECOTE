@@ -79,27 +79,33 @@ class DFA:
         '''
         self.format_states()
 
-        temp_string = '      STATE   '
+        ret = 'STATES\n'
+        for state in self.states:
+            ret += f'{state.id}: {state.id_set}\n'
+        print(ret)
+
+        ret = 'TRANSITION TABLE:\n'
+        ret += '      STATE   '
         for char in self.alphabet:
-            temp_string += '  ' + char + ' '
+            ret += '  ' + char + ' '
 
         for state in self.states:
             if state.id == 1:
-                temp_string += '\nBEGIN '
+                ret += '\nBEGIN '
             else:
-                temp_string += '      '
+                ret += '      '
 
-            temp_string += str(state.id) + '      '
+            ret += str(state.id) + '      '
 
             for char in self.alphabet:
-                temp_string += ' | ' + \
+                ret += ' | ' + \
                     str(state.transitions[char])
             if state.final:
-                temp_string += ' | FINAL\n'
+                ret += ' | FINAL\n'
             else:
-                temp_string += ' | \n'
+                ret += ' | \n'
 
-        print(temp_string)
+        print(ret)
 
     def format_states(self):
         '''
