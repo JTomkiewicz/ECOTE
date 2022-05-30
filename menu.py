@@ -62,12 +62,24 @@ def is_regex_correct(regex):
             'Given regex contain different number of closing and opening parentheses!')
 
 
+def add_cat_rules(c1, c2, alphabet):
+    if c1 in alphabet and c2 in alphabet:
+        return True
+    if c1 in [')', '*'] and c2 in alphabet:
+        return True
+    if c1 in alphabet and c2 == '(':
+        return True
+    if c1 == ')' and c2 == '(':
+        return True
+    return False
+
+
 def add_cat_symbol(regex, alphabet):
     i = 0
     while True:
         if i == len(regex) - 1:
             break
-        if regex[i] in alphabet and regex[i+1] in alphabet:
+        if add_cat_rules(regex[i], regex[i+1], alphabet):
             regex = regex[:i+1] + '.' + regex[i+1:]
             i = 0
         else:

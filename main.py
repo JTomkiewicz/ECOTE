@@ -8,9 +8,6 @@ def main():
     menu.show_menu('Convert regex to DFA')
     alphabet, regex = menu.read_regex()
 
-    print(regex)
-    return
-
     # construct & print syntax tree
     tree = SyntaxTree(regex)
     tree.print_tree()
