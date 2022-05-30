@@ -9,7 +9,10 @@ class Node:
         self.lastpos = set()
         self.nullable = False
 
-    def label_to_string(self):
+    def label_to_string(self, show_func):
+        '''
+        Symbols to strings and functions
+        '''
         first_pos_string = ','.join(map(str, self.firstpos))
         last_pos_string = ','.join(map(str, self.lastpos))
         char_string = self.char
@@ -21,16 +24,18 @@ class Node:
         elif self.char == '|':
             char_string = 'OR'
 
-        return f'{char_string} frst({first_pos_string}) lst({last_pos_string})'
+        if show_func:
+            return f'{char_string} first_pos({first_pos_string}) last_pos({last_pos_string})'
+        return char_string
 
-    def print_tree(self, level=0, linelist=[], rchild=False, instar=False):
+    def print_tree(self, level=0, linelist=[], rchild=False, instar=False, show_func=False):
         '''
         Print tree in a pretty way
         '''
         star = self.char == '*'
 
         if level == 0:
-            tree_string = '\n' + self.label_to_string() + '\n'
+            tree_string = '\n' + self.label_to_string(show_func) + '\n'
         else:
             temp_string = ''
             if not instar:
@@ -45,18 +50,18 @@ class Node:
                         temp_string += '\n'
 
             tree_string = temp_string + '___' + \
-                self.label_to_string() + '\n' * (not star)
+                self.label_to_string(show_func) + '\n' * (not star)
 
         if rchild:
             linelist.pop(-1)
 
         if self.lchild:
             tree_string += self.lchild.print_tree(level + 1, linelist +
-                                                  [level] * (not star), instar=star)
+                                                  [level] * (not star), instar=star, show_func=show_func)
 
         if self.rchild:
             tree_string += self.rchild.print_tree(level + 1, linelist +
-                                                  [level], rchild=True)
+                                                  [level], rchild=True, show_func=show_func)
 
         return tree_string
 
@@ -225,3 +230,4 @@ class SyntaxTree:
         Print syntax tree starting from root.
         '''
         print(self.root.print_tree())
+        print(self.root.print_tree(show_func=True))
