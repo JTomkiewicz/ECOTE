@@ -9,14 +9,19 @@ class Node:
         self.lastpos = set()
         self.nullable = False
 
-    def label_to_string(self, char):
-        if char == '.':
-            return 'CAT'
-        if char == '*':
-            return 'STAR'
-        if char == '|':
-            return 'OR'
-        return char
+    def label_to_string(self):
+        first_pos_string = ','.join(map(str, self.firstpos))
+        last_pos_string = ','.join(map(str, self.lastpos))
+        char_string = self.char
+
+        if self.char == '.':
+            char_string = 'CAT'
+        elif self.char == '*':
+            char_string = 'STAR'
+        elif self.char == '|':
+            char_string = 'OR'
+
+        return f'{char_string} frst({first_pos_string}) lst({last_pos_string})'
 
     def print_tree(self, level=0, linelist=[], rchild=False, instar=False):
         '''
@@ -25,7 +30,7 @@ class Node:
         star = self.char == '*'
 
         if level == 0:
-            tree_string = '\n' + self.label_to_string(self.char) + '\n'
+            tree_string = '\n' + self.label_to_string() + '\n'
         else:
             temp_string = ''
             if not instar:
@@ -40,7 +45,7 @@ class Node:
                         temp_string += '\n'
 
             tree_string = temp_string + '___' + \
-                self.label_to_string(self.char) + '\n' * (not star)
+                self.label_to_string() + '\n' * (not star)
 
         if rchild:
             linelist.pop(-1)
