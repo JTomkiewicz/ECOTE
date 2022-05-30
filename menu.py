@@ -1,7 +1,7 @@
 import re
 
 
-def show_menu(txt: str):
+def show_menu(txt):
     print('What would you like to do?')
     print(f'0 - {txt}\n1 - exit')
 
@@ -15,7 +15,7 @@ def show_menu(txt: str):
         quit()
 
 
-def read_option() -> int:
+def read_option():
     while True:
         try:
             number = input('Input: ')
@@ -26,10 +26,12 @@ def read_option() -> int:
     return int(number)
 
 
-def read_regex() -> str:
+def read_regex():
     regex = input('Input regex: ')
     regex = re.sub('[^a-zA-Z0-9\*\(\)\|\.]', '', regex)
     is_regex_correct(regex)
+
+    regex = add_cat_symbol(regex)
 
     alphabet = []
     for char in regex:
@@ -39,7 +41,7 @@ def read_regex() -> str:
     return alphabet, regex
 
 
-def is_regex_correct(regex: str):
+def is_regex_correct(regex):
     if len(regex.strip()) == 0:
         raise Exception('Given regex is empty!')
 
@@ -60,6 +62,10 @@ def is_regex_correct(regex: str):
             'Given regex contain different number of closing and opening parentheses!')
 
 
-def read_input_string() -> str:
+def add_cat_symbol(regex):
+    pass
+
+
+def read_input_string():
     input_string = input('Input string: ')
     return input_string
