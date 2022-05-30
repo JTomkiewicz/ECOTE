@@ -18,33 +18,34 @@ class DFA:
     '''
 
     def __init__(self, tree, alphabet):
+        self.tree = tree
+        self.count = 1
         self.states = []
         self.alphabet = alphabet
-        self.id_counter = 1
-        self.terminal = tree.id_counter - 1
-        self.create_states(tree)
+        self.terminal = tree.count - 1
+        self.create_states()
 
-    def create_states(self, tree):
-        first_state = State(self.alphabet, tree.root.firstpos,
-                            self.next_id(), self.terminal)
+    def create_states(self):
+        first_state = State(self.alphabet, self.tree.root.firstpos,
+                            self.sequence(), self.terminal)
         self.states.append(first_state)
 
         states = [first_state]
         # transitions to all states
         while(len(states) > 0):
             temp_state = states.pop(0)
-            states_list = self.transition(temp_state, tree)
+            states_list = self.transition(temp_state, self.tree)
             for s in states_list:
-                state = State(self.alphabet, s, self.next_id(), self.terminal)
+                state = State(self.alphabet, s, self.sequence(), self.terminal)
                 self.states.append(state)
                 states.append(state)
 
-    def next_id(self):
+    def sequence(self):
         '''
         Return counter and increment it.
         '''
-        i = self.id_counter
-        self.id_counter += 1
+        i = self.count
+        self.count += 1
         return i
 
     def transition(self, state, tree):
@@ -78,18 +79,26 @@ class DFA:
         '''
         self.format_states()
 
-        temp_string = ''
+        temp_string = '      STATE   '
+        for char in self.alphabet:
+            temp_string += '  ' + char + ' '
+
         for state in self.states:
             if state.id == 1:
-                temp_string += '->\t'
+                temp_string += '\nBEGIN '
             else:
-                temp_string += '\t'
-            temp_string += str(state.id) + '\t'
+                temp_string += '      '
+
+            temp_string += str(state.id) + '      '
+
             for char in self.alphabet:
-                temp_string += char + ' : ' + \
-                    str(state.transitions[char]) + '\t'
+                temp_string += ' | ' + \
+                    str(state.transitions[char])
             if state.final:
-                temp_string += '\tFINAL\n'
+                temp_string += ' | FINAL\n'
+            else:
+                temp_string += ' | \n'
+
         print(temp_string)
 
     def format_states(self):
@@ -101,7 +110,7 @@ class DFA:
             for char in self.alphabet:
                 if state.transitions[char] is None:
                     none_states = True
-                    state.transitions[char] = self.id_counter
+                    state.transitions[char] = self.count
                 temp_transitions = state.transitions[char]
                 for second_state in self.states:
                     if second_state.id_set == temp_transitions:
@@ -109,6 +118,6 @@ class DFA:
 
         if none_states:
             self.states.append(
-                State(self.alphabet, [], self.id_counter, self.terminal))
+                State(self.alphabet, [], self.count, self.terminal))
             for char in self.alphabet:
                 self.states[-1].transitions[char] = self.states[-1].id

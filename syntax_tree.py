@@ -1,46 +1,46 @@
 class Node:
-    def __init__(self, type, label, id=None, lchild=None, rchild=None):
-        self.type = type
-        self.label = label
+    def __init__(self, char, id=None, lchild=None, rchild=None):
+        self.char = char
         self.id = id
         self.lchild = lchild
         self.rchild = rchild
-        self.nullable = False
+        # three functions
         self.firstpos = set()
         self.lastpos = set()
+        self.nullable = False
 
     def label_to_string(self, char):
         if char == '.':
-            return 'cat'
+            return 'CAT'
         if char == '*':
-            return 'star'
+            return 'STAR'
         if char == '|':
-            return 'or'
+            return 'OR'
         return char
 
     def print_tree(self, level=0, linelist=[], rchild=False, instar=False):
         '''
         Print tree in a pretty way
         '''
-        star = self.type == 'star'
+        star = self.char == '*'
 
         if level == 0:
-            tree_string = self.label_to_string(self.label) + '\n'
+            tree_string = '\n' + self.label_to_string(self.char) + '\n'
         else:
             temp_string = ''
             if not instar:
                 for i in range(2):
                     for j in range(level):
                         if j in linelist:
-                            temp_string += '\t' * (j != 0) + '|'
+                            temp_string += '   ' * (j != 0) + '|'
                         else:
-                            temp_string += '\t'
+                            temp_string += '   '
 
                     if i == 0:
                         temp_string += '\n'
 
             tree_string = temp_string + '___' + \
-                self.label_to_string(self.label) + '\n' * (not star)
+                self.label_to_string(self.char) + '\n' * (not star)
 
         if rchild:
             linelist.pop(-1)
@@ -68,7 +68,7 @@ class SyntaxTree:
         self.create_stack()
 
         # root node is always catenation of # (right-hand marker) and rest of the tree
-        self.root = Node('cat', '.')
+        self.root = Node('.')
         self.leaves = dict()
 
         # build tree without functions
@@ -134,26 +134,26 @@ class SyntaxTree:
                 lc = temp_stack.pop()
                 rc = temp_stack.pop()
                 temp_stack.append(
-                    Node('cat', '.', lchild=lc, rchild=rc))
+                    Node('.', lchild=lc, rchild=rc))
             elif token == '*':
                 lc = temp_stack.pop()
-                temp_stack.append(Node('star', '*', lchild=lc))
+                temp_stack.append(Node('*', lchild=lc))
             elif token == '|':
                 lc = temp_stack.pop()
                 rc = temp_stack.pop()
-                temp_stack.append(Node('or', '|', lchild=lc, rchild=rc))
+                temp_stack.append(Node('|', lchild=lc, rchild=rc))
             else:
-                temp_node = Node('identifier', token, id=self.give_id())
-                self.leaves[temp_node.id] = temp_node.label
+                temp_node = Node(token, id=self.sequence())
+                self.leaves[temp_node.id] = temp_node.char
                 temp_stack.append(temp_node)
 
         # at the end add right-hand marker #
-        temp_node = Node('identifier', '#', id=self.give_id())
-        self.leaves[temp_node.id] = temp_node.label
+        temp_node = Node('#', id=self.sequence())
+        self.leaves[temp_node.id] = temp_node.char
         self.root.lchild = temp_stack.pop()
         self.root.rchild = temp_node
 
-    def give_id(self):
+    def sequence(self):
         '''
         Return count and increment it.
         '''
@@ -173,25 +173,17 @@ class SyntaxTree:
         self.calculate_functions(node.lchild)
         self.calculate_functions(node.rchild)
 
-        if node.type == 'identifier':
-            if node.label == '@':
-                # when empty char
-                node.nullable = True
-            else:
-                node.firstpos.add(node.id)
-                node.lastpos.add(node.id)
-        elif node.type == 'or':
+        if node.char == '|':
             node.nullable = node.lchild.nullable or node.rchild.nullable
-            # | is equivalent to union
             node.firstpos = node.lchild.firstpos | node.rchild.firstpos
             node.lastpos = node.lchild.lastpos | node.rchild.lastpos
-        elif node.type == 'star':
+        elif node.char == '*':
             node.nullable = True
             node.firstpos = node.lchild.firstpos
             node.lastpos = node.lchild.lastpos
             # compute followpos for star
             self.calculate_followpos(node)
-        elif node.type == 'cat':
+        elif node.char == '.':
             node.nullable = node.lchild.nullable and node.rchild.nullable
             if node.lchild.nullable:  # firstpos
                 node.firstpos = node.lchild.firstpos | node.rchild.firstpos
@@ -203,17 +195,25 @@ class SyntaxTree:
                 node.lastpos = node.rchild.lastpos
             # conpute followpos for cat
             self.calculate_followpos(node)
+        else:
+            if node.char == '@':
+                # when empty char
+                node.nullable = True
+            else:
+                node.firstpos.add(node.id)
+                node.lastpos.add(node.id)
 
     def calculate_followpos(self, node):
         '''
         Calculate followpos for star and cat.
         '''
-        if node.type == 'cat':
+        if node.char in ['.', '*']:
             for pos in node.lchild.lastpos:
-                self.followpos[pos] = self.followpos[pos] | node.rchild.firstpos
-        elif node.type == 'star':
-            for pos in node.lchild.lastpos:
-                self.followpos[pos] = self.followpos[pos] | node.lchild.firstpos
+                if node.char == '.':
+                    firstpos_union = node.rchild.firstpos
+                else:
+                    firstpos_union = node.lchild.firstpos
+                self.followpos[pos] = self.followpos[pos] | firstpos_union
 
     def print_tree(self):
         '''
