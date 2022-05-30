@@ -9,6 +9,15 @@ class Node:
         self.firstpos = set()
         self.lastpos = set()
 
+    def label_to_string(self, char):
+        if char == '.':
+            return 'cat'
+        if char == '*':
+            return 'star'
+        if char == '|':
+            return 'or'
+        return char
+
     def print_tree(self, level=0, linelist=[], rchild=False, instar=False):
         '''
         Print tree in a pretty way
@@ -16,7 +25,7 @@ class Node:
         star = self.type == 'star'
 
         if level == 0:
-            ret = self.label + '\n'
+            tree_string = self.label_to_string(self.label) + '\n'
         else:
             temp_string = ''
             if not instar:
@@ -30,48 +39,52 @@ class Node:
                     if i == 0:
                         temp_string += '\n'
 
-            ret = temp_string + '___' + self.label + '\n' * (not star)
+            tree_string = temp_string + '___' + \
+                self.label_to_string(self.label) + '\n' * (not star)
 
         if rchild:
             linelist.pop(-1)
 
         if self.lchild:
-            ret += self.lchild.print_tree(level + 1, linelist +
-                                          [level] * (not star), instar=star)
+            tree_string += self.lchild.print_tree(level + 1, linelist +
+                                                  [level] * (not star), instar=star)
 
         if self.rchild:
-            ret += self.rchild.print_tree(level + 1, linelist +
-                                          [level], rchild=True)
+            tree_string += self.rchild.print_tree(level + 1, linelist +
+                                                  [level], rchild=True)
 
-        return ret
+        return tree_string
 
 
 class SyntaxTree:
     def __init__(self, regex):
+        self.regex = regex
+        self.count = 1
+
+        # create tokens and stack
         self.tokens = []
         self.stack = []
-
-        self.create_tokens(regex)
+        self.create_tokens()
         self.create_stack()
 
-        # root node is always concatenation of # (right-hand marker) and rest of the tree
-        self.root = Node('concat', '.')
+        # root node is always catenation of # (right-hand marker) and rest of the tree
+        self.root = Node('cat', '.')
         self.leaves = dict()
-        self.id_counter = 1
 
+        # build tree without functions
         self.build_tree()
 
         # evaluate four functions: firstpos, lastpos, nullable, followpos
-        self.followpos = [set() for _ in range(self.id_counter)]
+        self.followpos = [set() for _ in range(self.count)]
         self.calculate_functions(self.root)
 
-    def create_tokens(self, regex):
+    def create_tokens(self):
         '''
         Create tokens (list that has elements and alphabets of regex) from regex.
         '''
         temp_str = ''
 
-        for char in regex:
+        for char in self.regex:
             if char in ['(', ')', '|', '*', '.']:
                 if temp_str != '':
                     self.tokens.append(temp_str)
@@ -121,7 +134,7 @@ class SyntaxTree:
                 lc = temp_stack.pop()
                 rc = temp_stack.pop()
                 temp_stack.append(
-                    Node('concat', '.', lchild=lc, rchild=rc))
+                    Node('cat', '.', lchild=lc, rchild=rc))
             elif token == '*':
                 lc = temp_stack.pop()
                 temp_stack.append(Node('star', '*', lchild=lc))
@@ -130,22 +143,22 @@ class SyntaxTree:
                 rc = temp_stack.pop()
                 temp_stack.append(Node('or', '|', lchild=lc, rchild=rc))
             else:
-                temp_node = Node('identifier', token, id=self.next_id())
+                temp_node = Node('identifier', token, id=self.give_id())
                 self.leaves[temp_node.id] = temp_node.label
                 temp_stack.append(temp_node)
 
         # at the end add right-hand marker #
-        temp_node = Node('identifier', '#', id=self.next_id())
+        temp_node = Node('identifier', '#', id=self.give_id())
         self.leaves[temp_node.id] = temp_node.label
         self.root.lchild = temp_stack.pop()
         self.root.rchild = temp_node
 
-    def next_id(self):
+    def give_id(self):
         '''
-        Return counter and increment it.
+        Return count and increment it.
         '''
-        i = self.id_counter
-        self.id_counter += 1
+        i = self.count
+        self.count += 1
         return i
 
     def calculate_functions(self, node):
@@ -178,7 +191,7 @@ class SyntaxTree:
             node.lastpos = node.lchild.lastpos
             # compute followpos for star
             self.calculate_followpos(node)
-        elif node.type == 'concat':
+        elif node.type == 'cat':
             node.nullable = node.lchild.nullable and node.rchild.nullable
             if node.lchild.nullable:  # firstpos
                 node.firstpos = node.lchild.firstpos | node.rchild.firstpos
@@ -188,14 +201,14 @@ class SyntaxTree:
                 node.lastpos = node.lchild.lastpos | node.rchild.lastpos
             else:
                 node.lastpos = node.rchild.lastpos
-            # conpute followpos for concat
+            # conpute followpos for cat
             self.calculate_followpos(node)
 
     def calculate_followpos(self, node):
         '''
-        Calculate followpos for star and concat.
+        Calculate followpos for star and cat.
         '''
-        if node.type == 'concat':
+        if node.type == 'cat':
             for pos in node.lchild.lastpos:
                 self.followpos[pos] = self.followpos[pos] | node.rchild.firstpos
         elif node.type == 'star':
@@ -204,6 +217,6 @@ class SyntaxTree:
 
     def print_tree(self):
         '''
-        Print syntax tree.
+        Print syntax tree starting from root.
         '''
         print(self.root.print_tree())
