@@ -49,7 +49,7 @@ class Node:
                 self.label_to_string(show_func) + '\n' * (not star)
 
         if rchild:
-            linelist.pop(-1)
+            linelist.pop()
 
         if self.lchild:
             tree_string += self.lchild.print_tree(level + 1, linelist +
@@ -86,13 +86,12 @@ class SyntaxTree:
 
     # Creates table containing chars from regex in postfix notation (operator is at the right ex. x*y is xy*)
     def create_tokens(self):
-        temp_tokens = []
-
         # store regex chars in table
         char_table = []
         for char in self.regex:
             char_table.append(char)
 
+        temp_tokens = []
         for token in char_table:
             if token in ['(', '*']:
                 temp_tokens.append(token)
@@ -116,9 +115,7 @@ class SyntaxTree:
 
     # Build syntax tree at this moment without function evaluation
     def build_tree(self):
-
         temp_stack = []
-
         for token in self.tokens:
             if token == '.':
                 lc = temp_stack.pop()
@@ -134,11 +131,13 @@ class SyntaxTree:
                 temp_stack.append(Node('|', lchild=lc, rchild=rc))
             else:
                 temp_node = Node(token, id=self.sequence())
+                # nodes that contain alphabet chars are leaves
                 self.leaves[temp_node.id] = temp_node.char
                 temp_stack.append(temp_node)
 
         # at the end add right-hand marker #
         temp_node = Node('#', id=self.sequence())
+        # right-hand marker is a leaf too
         self.leaves[temp_node.id] = temp_node.char
         self.root.lchild = temp_stack.pop()
         self.root.rchild = temp_node
@@ -170,20 +169,23 @@ class SyntaxTree:
             self.calculate_followpos(node)
         elif node.char == '.':
             node.nullable = node.lchild.nullable and node.rchild.nullable
-            if node.lchild.nullable:  # firstpos
+            # firstpos
+            if node.lchild.nullable:
                 node.firstpos = node.lchild.firstpos | node.rchild.firstpos
             else:
                 node.firstpos = node.lchild.firstpos
-            if node.rchild.nullable:  # lastpos
+            # lastpos
+            if node.rchild.nullable:
                 node.lastpos = node.lchild.lastpos | node.rchild.lastpos
             else:
                 node.lastpos = node.rchild.lastpos
             self.calculate_followpos(node)
         else:
+            # leaf node labelled with position i
             node.firstpos.add(node.id)
             node.lastpos.add(node.id)
 
-    # Calculate followpos for . and *
+    # Rules for followpos reffer only to cat-node and star-node
     def calculate_followpos(self, node):
         if node.char in ['.', '*']:
             for pos in node.lchild.lastpos:
