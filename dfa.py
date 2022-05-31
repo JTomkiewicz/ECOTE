@@ -1,8 +1,5 @@
+# Single state of automata
 class State:
-    '''
-    Single state of automaton
-    '''
-
     def __init__(self, alphabet, id_list, id, terminal_id):
         self.id = id
         self.id_set = set(id_list)
@@ -12,11 +9,8 @@ class State:
             self.transitions[char] = None
 
 
+# Deterministic Finite Automaton
 class DFA:
-    '''
-    Deterministic Finite Automaton
-    '''
-
     def __init__(self, tree, alphabet):
         self.tree = tree
         self.count = 1
@@ -40,17 +34,14 @@ class DFA:
                 self.states.append(state)
                 states.append(state)
 
+    # Return counter and increment it
     def sequence(self):
-        '''
-        Return counter and increment it.
-        '''
         i = self.count
         self.count += 1
         return i
 
+    # Find transitions from state
     def transition(self, state, tree):
-        '''
-        Find transitions from state'''
         states = []
 
         for i in state.id_set:
@@ -73,10 +64,8 @@ class DFA:
 
         return states
 
+    # Print DFA
     def print_dfa(self):
-        '''
-        Print DFA.
-        '''
         self.format_states()
 
         ret = 'STATES\n'
@@ -107,10 +96,8 @@ class DFA:
 
         print(ret)
 
+    # Format states.
     def format_states(self):
-        '''
-        Format states.
-        '''
         none_states = False
         for state in self.states:
             for char in self.alphabet:

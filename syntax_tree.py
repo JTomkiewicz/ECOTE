@@ -9,10 +9,8 @@ class Node:
         self.lastpos = set()
         self.nullable = False
 
+    # Convert symbols to strings and show functions
     def label_to_string(self, show_func):
-        '''
-        Symbols to strings and functions
-        '''
         first_pos_string = ','.join(map(str, self.firstpos))
         last_pos_string = ','.join(map(str, self.lastpos))
         char_string = self.char
@@ -28,10 +26,8 @@ class Node:
             return f'{char_string} first_pos({first_pos_string}) last_pos({last_pos_string})'
         return char_string
 
+    # Print tree in a pretty way
     def print_tree(self, level=0, linelist=[], rchild=False, instar=False, show_func=False):
-        '''
-        Print tree in a pretty way
-        '''
         star = self.char == '*'
 
         if level == 0:
@@ -84,12 +80,11 @@ class SyntaxTree:
 
         # evaluate four functions: firstpos, lastpos, nullable, followpos
         self.followpos = [set() for _ in range(self.count)]
+        # evaluate recursively starting from root
         self.calculate_functions(self.root)
 
+    # Create tokens from input regex
     def create_tokens(self):
-        '''
-        Create tokens that from input regex.
-        '''
         temp_stack = []
 
         char_table = []
@@ -117,10 +112,9 @@ class SyntaxTree:
         while len(temp_stack) > 0:
             self.tokens.append(temp_stack.pop())
 
+    # Build syntax tree at this moment without function evaluation
     def build_tree(self):
-        '''
-        Build syntax tree at this moment without firstpos and lastpos functions.
-        '''
+
         temp_stack = []
 
         for token in self.tokens:
@@ -147,19 +141,15 @@ class SyntaxTree:
         self.root.lchild = temp_stack.pop()
         self.root.rchild = temp_node
 
+    # Return count and increment it
     def sequence(self):
-        '''
-        Return count and increment it.
-        '''
         i = self.count
         self.count += 1
         return i
 
+    # Using recursion calculate nullable, firstpos and lastpos for each node
     def calculate_functions(self, node):
-        '''
-        Using recursion calculate nullable, firstpos and lastpos for each node.
-        '''
-        # stop recursion when node in Nullable
+        # stop recursion
         if not node:
             return
 
@@ -197,10 +187,8 @@ class SyntaxTree:
                 node.firstpos.add(node.id)
                 node.lastpos.add(node.id)
 
+    # Calculate followpos for . and *
     def calculate_followpos(self, node):
-        '''
-        Calculate followpos for star and cat.
-        '''
         if node.char in ['.', '*']:
             for pos in node.lchild.lastpos:
                 if node.char == '.':
@@ -209,9 +197,9 @@ class SyntaxTree:
                     firstpos_union = node.lchild.firstpos
                 self.followpos[pos] = self.followpos[pos] | firstpos_union
 
+    # Print syntax tree starting from root
     def print_tree(self):
-        '''
-        Print syntax tree starting from root.
-        '''
+        # print tree without functions
         print(self.root.print_tree())
+        # print tree with functions
         print(self.root.print_tree(show_func=True))
