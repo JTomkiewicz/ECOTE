@@ -2,7 +2,7 @@ import re
 
 
 def show_menu(txt):
-    print('What would you like to do?')
+    print('\nWhat would you like to do?')
     print(f'0 - {txt}\n1 - exit')
 
     while True:
@@ -30,6 +30,8 @@ def read_regex():
     regex = input('Input regex: ')
     regex = re.sub('[^a-zA-Z0-9\*\(\)\|]', '', regex)
     is_regex_correct(regex)
+
+    print()
 
     alphabet = []
     for char in regex:

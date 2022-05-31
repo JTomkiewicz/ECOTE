@@ -31,7 +31,7 @@ class Node:
         star = self.char == '*'
 
         if level == 0:
-            tree_string = '\n' + self.label_to_string(show_func) + '\n'
+            tree_string = self.label_to_string(show_func) + '\n'
         else:
             temp_string = ''
             if not instar:
@@ -73,6 +73,7 @@ class SyntaxTree:
 
         # root node is always catenation of # (right-hand marker) and rest of the tree
         self.root = Node('.')
+        # leaves are nodes that contain only chars from alphabet
         self.leaves = dict()
 
         # build tree without functions
@@ -83,10 +84,11 @@ class SyntaxTree:
         # evaluate recursively starting from root
         self.calculate_functions(self.root)
 
-    # Create tokens from input regex
+    # Creates table containing chars from regex in postfix notation (operator is at the right ex. x*y is xy*)
     def create_tokens(self):
         temp_stack = []
 
+        # store regex chars in table
         char_table = []
         for char in self.regex:
             char_table.append(char)
@@ -180,12 +182,8 @@ class SyntaxTree:
             # conpute followpos for cat
             self.calculate_followpos(node)
         else:
-            if node.char == '@':
-                # when empty char
-                node.nullable = True
-            else:
-                node.firstpos.add(node.id)
-                node.lastpos.add(node.id)
+            node.firstpos.add(node.id)
+            node.lastpos.add(node.id)
 
     # Calculate followpos for . and *
     def calculate_followpos(self, node):
@@ -199,7 +197,7 @@ class SyntaxTree:
 
     # Print syntax tree starting from root
     def print_tree(self):
-        # print tree without functions
+        print('SYNTAX TREE WITHOUT FUNCTIONS:')
         print(self.root.print_tree())
-        # print tree with functions
+        print('SYNTAX TREE WITH FUNCTIONS:')
         print(self.root.print_tree(show_func=True))
