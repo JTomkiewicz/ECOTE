@@ -27,17 +27,17 @@ class Node:
         return char_string
 
     # Print tree in a pretty way
-    def print_tree(self, level=0, linelist=[], rchild=False, instar=False, show_func=False):
-        star = self.char == '*'
+    def print_tree(self, tree_level=0, saved_lines=[], is_rchild=False, is_mother_star_node=False, show_func=False):
+        is_star = self.char == '*'
 
-        if level == 0:
+        if tree_level == 0:
             tree_string = self.label_to_string(show_func) + '\n'
         else:
             string = ''
-            if not instar:
+            if not is_mother_star_node:
                 for i in range(2):
-                    for j in range(level):
-                        if j in linelist:
+                    for j in range(tree_level):
+                        if j in saved_lines:
                             string += '   ' * (j != 0) + '|'
                         else:
                             string += '   '
@@ -46,18 +46,17 @@ class Node:
                         string += '\n'
 
             tree_string = string + '___' + \
-                self.label_to_string(show_func) + '\n' * (not star)
+                self.label_to_string(show_func) + '\n' * (not is_star)
 
-        if rchild:
-            linelist.pop()
+        if is_rchild:
+            saved_lines.pop()
 
         if self.lchild:
-            tree_string += self.lchild.print_tree(level + 1, linelist +
-                                                  [level] * (not star), instar=star, show_func=show_func)
-
-        if self.rchild:
-            tree_string += self.rchild.print_tree(level + 1, linelist +
-                                                  [level], rchild=True, show_func=show_func)
+            tree_string += self.lchild.print_tree(tree_level + 1, saved_lines +
+                                                  [tree_level] * (not is_star), False, is_star, show_func)
+        elif self.rchild:
+            tree_string += self.rchild.print_tree(tree_level + 1, saved_lines +
+                                                  [tree_level], True, False, show_func)
 
         return tree_string
 
