@@ -84,7 +84,6 @@ def add_cat_symbol(regex, alphabet):
             i = 0
         else:
             i += 1
-
     return regex
 
 
