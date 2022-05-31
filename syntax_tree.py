@@ -71,11 +71,9 @@ class SyntaxTree:
         self.regex = regex
         self.count = 1
 
-        # create tokens and stack
+        # create tokens
         self.tokens = []
-        self.stack = []
         self.create_tokens()
-        self.create_stack()
 
         # root node is always catenation of # (right-hand marker) and rest of the tree
         self.root = Node('.')
@@ -90,48 +88,34 @@ class SyntaxTree:
 
     def create_tokens(self):
         '''
-        Create tokens (list that has elements and alphabets of regex) from regex.
-        '''
-        temp_str = ''
-
-        for char in self.regex:
-            if char in ['(', ')', '|', '*', '.']:
-                if temp_str != '':
-                    self.tokens.append(temp_str)
-                    temp_str = ''
-                self.tokens.append(char)
-            else:
-                temp_str += char
-
-        if temp_str != '':
-            self.tokens.append(temp_str)
-
-    def create_stack(self):
-        '''
-        Create stack from tokens that is later used to create tree.
+        Create tokens that from input regex.
         '''
         temp_stack = []
 
-        for token in self.tokens:
+        char_table = []
+        for char in self.regex:
+            char_table.append(char)
+
+        for token in char_table:
             if token in ['(', '*']:
                 temp_stack.append(token)
             elif token == ')':
                 while len(temp_stack) > 0 and temp_stack[-1] != '(':
-                    self.stack.append(temp_stack.pop())
+                    self.tokens.append(temp_stack.pop())
                 temp_stack.pop()
             elif token == '|':
                 while len(temp_stack) > 0 and temp_stack[-1] in ['*', '.']:
-                    self.stack.append(temp_stack.pop())
+                    self.tokens.append(temp_stack.pop())
                 temp_stack.append(token)
             elif token == '.':
                 while len(temp_stack) > 0 and temp_stack[-1] == '*':
-                    self.stack.append(temp_stack.pop())
+                    self.tokens.append(temp_stack.pop())
                 temp_stack.append(token)
             else:
-                self.stack.append(token)
+                self.tokens.append(token)
 
         while len(temp_stack) > 0:
-            self.stack.append(temp_stack.pop())
+            self.tokens.append(temp_stack.pop())
 
     def build_tree(self):
         '''
@@ -139,7 +123,7 @@ class SyntaxTree:
         '''
         temp_stack = []
 
-        for token in self.stack:
+        for token in self.tokens:
             if token == '.':
                 lc = temp_stack.pop()
                 rc = temp_stack.pop()
