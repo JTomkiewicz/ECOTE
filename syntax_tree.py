@@ -33,19 +33,19 @@ class Node:
         if level == 0:
             tree_string = self.label_to_string(show_func) + '\n'
         else:
-            temp_string = ''
+            string = ''
             if not instar:
                 for i in range(2):
                     for j in range(level):
                         if j in linelist:
-                            temp_string += '   ' * (j != 0) + '|'
+                            string += '   ' * (j != 0) + '|'
                         else:
-                            temp_string += '   '
+                            string += '   '
 
                     if i == 0:
-                        temp_string += '\n'
+                        string += '\n'
 
-            tree_string = temp_string + '___' + \
+            tree_string = string + '___' + \
                 self.label_to_string(show_func) + '\n' * (not star)
 
         if rchild:
@@ -86,7 +86,7 @@ class SyntaxTree:
 
     # Creates table containing chars from regex in postfix notation (operator is at the right ex. x*y is xy*)
     def create_tokens(self):
-        temp_stack = []
+        temp_tokens = []
 
         # store regex chars in table
         char_table = []
@@ -95,24 +95,24 @@ class SyntaxTree:
 
         for token in char_table:
             if token in ['(', '*']:
-                temp_stack.append(token)
+                temp_tokens.append(token)
             elif token == ')':
-                while len(temp_stack) > 0 and temp_stack[-1] != '(':
-                    self.tokens.append(temp_stack.pop())
-                temp_stack.pop()
+                while len(temp_tokens) > 0 and temp_tokens[-1] != '(':
+                    self.tokens.append(temp_tokens.pop())
+                temp_tokens.pop()
             elif token == '|':
-                while len(temp_stack) > 0 and temp_stack[-1] in ['*', '.']:
-                    self.tokens.append(temp_stack.pop())
-                temp_stack.append(token)
+                while len(temp_tokens) > 0 and temp_tokens[-1] in ['*', '.']:
+                    self.tokens.append(temp_tokens.pop())
+                temp_tokens.append(token)
             elif token == '.':
-                while len(temp_stack) > 0 and temp_stack[-1] == '*':
-                    self.tokens.append(temp_stack.pop())
-                temp_stack.append(token)
+                while len(temp_tokens) > 0 and temp_tokens[-1] == '*':
+                    self.tokens.append(temp_tokens.pop())
+                temp_tokens.append(token)
             else:
                 self.tokens.append(token)
 
-        while len(temp_stack) > 0:
-            self.tokens.append(temp_stack.pop())
+        while len(temp_tokens) > 0:
+            self.tokens.append(temp_tokens.pop())
 
     # Build syntax tree at this moment without function evaluation
     def build_tree(self):
@@ -167,7 +167,6 @@ class SyntaxTree:
             node.nullable = True
             node.firstpos = node.lchild.firstpos
             node.lastpos = node.lchild.lastpos
-            # compute followpos for star
             self.calculate_followpos(node)
         elif node.char == '.':
             node.nullable = node.lchild.nullable and node.rchild.nullable
@@ -179,7 +178,6 @@ class SyntaxTree:
                 node.lastpos = node.lchild.lastpos | node.rchild.lastpos
             else:
                 node.lastpos = node.rchild.lastpos
-            # conpute followpos for cat
             self.calculate_followpos(node)
         else:
             node.firstpos.add(node.id)
@@ -197,7 +195,7 @@ class SyntaxTree:
 
     # Print syntax tree starting from root
     def print_tree(self):
-        print('SYNTAX TREE WITHOUT FUNCTIONS:')
+        print('\033[92mSYNTAX TREE WITHOUT FUNCTIONS:\033[0m')
         print(self.root.print_tree())
-        print('SYNTAX TREE WITH FUNCTIONS:')
+        print('\033[92mSYNTAX TREE WITH FUNCTIONS:\033[0m')
         print(self.root.print_tree(show_func=True))
