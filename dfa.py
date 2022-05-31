@@ -89,8 +89,9 @@ class DFA:
             string += str(state.id) + '      '
 
             for char in self.alphabet:
-                string += ' | ' + \
-                    str(state.transitions[char])
+                temp_transitions = str(state.transitions[char]) if bool(
+                    state.transitions[char]) else ' '
+                string += ' | ' + temp_transitions
             if state.final:
                 string += ' | FINAL\n'
             else:
@@ -98,21 +99,11 @@ class DFA:
 
         print(string)
 
-    # Format states
+    # Format states transitions so they are easier to read
     def format_states(self):
-        none_states = False
         for state in self.states:
             for char in self.alphabet:
-                if bool(state.transitions[char]) == False:
-                    none_states = True
-                    state.transitions[char] = self.count
                 temp_transitions = state.transitions[char]
                 for second_state in self.states:
                     if second_state.id_set == temp_transitions:
                         state.transitions[char] = second_state.id
-
-        if none_states:
-            self.states.append(
-                State(self.alphabet, [], self.count, self.terminal))
-            for char in self.alphabet:
-                self.states[-1].transitions[char] = self.states[-1].id
