@@ -40,7 +40,7 @@ class Node:
                         if j in saved_lines:
                             string += '   ' * (j != 0) + '|'
                         else:
-                            string += '   '
+                            string += '   ' + '   ' * (not is_star)
 
                     if i == 0:
                         string += '\n'
@@ -54,9 +54,10 @@ class Node:
         if self.lchild:
             tree_string += self.lchild.print_tree(tree_level + 1, saved_lines +
                                                   [tree_level] * (not is_star), False, is_star, show_func)
-        elif self.rchild:
+
+        if self.rchild:
             tree_string += self.rchild.print_tree(tree_level + 1, saved_lines +
-                                                  [tree_level], True, False, show_func)
+                                                  [tree_level] * (not is_star), True, False, show_func)
 
         return tree_string
 
