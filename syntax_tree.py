@@ -40,7 +40,7 @@ class Node:
                         if j in saved_lines:
                             string += '   ' * (j != 0) + '|'
                         else:
-                            string += '   ' + '   ' * (not is_star)
+                            string += '   ' + '    ' * (not is_star)
 
                     if i == 0:
                         string += '\n'
