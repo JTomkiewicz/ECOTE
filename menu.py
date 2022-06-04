@@ -64,6 +64,10 @@ def is_regex_correct(regex, alphabet):
                 raise Exception(
                     f'\033[91mGiven regex contain | at index {i} but it is not between two characters!\033[0m')
 
+        if regex[i] in ['|', '*'] and regex[i+1] in ['|', '*']:
+            raise Exception(
+                f'\033[91mGiven regex contain symbols | or * at index {i} one after another!\033[0m')
+
     if open_sum != close_sum:
         raise Exception(
             '\033[91mGiven regex contain different number of closing and opening parentheses!\033[0m')
