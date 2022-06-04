@@ -29,7 +29,6 @@ def read_option():  # Check if given option is a integer
 def read_regex():  # Read regex, check if it is correct and return it with its alphabet
     regex = input('Input regex: ')
     regex = re.sub('[^a-zA-Z0-9\*\(\)\|]', '', regex)
-    is_regex_correct(regex)
 
     print()
 
@@ -38,29 +37,36 @@ def read_regex():  # Read regex, check if it is correct and return it with its a
         if char not in alphabet and char not in ['*', '|', '(', ')', '.']:
             alphabet.append(char)
 
+    is_regex_correct(regex, alphabet)
     regex = add_cat_symbol(regex, alphabet)
     return alphabet, regex
 
 
-def is_regex_correct(regex):  # Check length and if it contains proper parentheses
+# Check length and if it contains proper parentheses
+def is_regex_correct(regex, alphabet):
     if len(regex.strip()) == 0:
         raise Exception('Given regex is empty!')
 
-    open_sum, close_sum = 0, 0
+    open_sum = close_sum = 0
 
-    for char in regex:
-        if char == '(':
+    for i in range(len(regex)):
+        if regex[i] == '(':
             open_sum += 1
-        elif char == ')':
+        elif regex[i] == ')':
             close_sum += 1
 
         if close_sum > open_sum:
             raise Exception(
-                'Given regex contain closing parentheses before opening parentheses!')
+                f'\033[91mGiven regex contain closing parentheses at index {i} before opening parentheses!\033[0m')
+
+        if regex[i] == '|':
+            if regex[i-1] not in alphabet or regex[i+1] not in alphabet:
+                raise Exception(
+                    f'\033[91mGiven regex contain | at index {i} but it is not between two characters!\033[0m')
 
     if open_sum != close_sum:
         raise Exception(
-            'Given regex contain different number of closing and opening parentheses!')
+            '\033[91mGiven regex contain different number of closing and opening parentheses!\033[0m')
 
 
 def add_cat_rules(c1, c2, alphabet):  # Concatenation rules
