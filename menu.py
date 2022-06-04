@@ -59,14 +59,15 @@ def is_regex_correct(regex, alphabet):
             raise Exception(
                 f'\033[91mGiven regex contain closing parentheses at index {i} before opening parentheses!\033[0m')
 
-        if regex[i] == '|':
-            if regex[i-1] not in alphabet or regex[i+1] not in alphabet:
-                raise Exception(
-                    f'\033[91mGiven regex contain | at index {i} but it is not between two characters!\033[0m')
+        if i not in [0, 1, len(regex) - 2, len(regex) - 1]:
+            if regex[i] == '|':
+                if regex[i-1] not in alphabet or regex[i+1] not in alphabet:
+                    raise Exception(
+                        f'\033[91mGiven regex contain | at index {i} but it is not between two characters!\033[0m')
 
-        if regex[i] in ['|', '*'] and regex[i+1] in ['|', '*']:
-            raise Exception(
-                f'\033[91mGiven regex contain symbols | or * at index {i} one after another!\033[0m')
+            if regex[i] in ['|', '*'] and regex[i+1] in ['|', '*']:
+                raise Exception(
+                    f'\033[91mGiven regex contain symbols | or * at index {i} one after another!\033[0m')
 
     if open_sum != close_sum:
         raise Exception(
